@@ -3,4 +3,9 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
     alias(libs.plugins.compose.compiler) apply false
+    // Change this from 2.59.1 to 2.58
+    id("com.google.dagger.hilt.android") version "2.58" apply false
+
+    // Ensure KSP matches your Kotlin 2.1.20
+    id("com.google.devtools.ksp") version "2.1.20-1.0.31" apply false
 }
