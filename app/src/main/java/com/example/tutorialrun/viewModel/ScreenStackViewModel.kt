@@ -6,17 +6,19 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.saveable
+import com.example.tutorialrun.room.Note
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
 @Parcelize
 class ScreenInfo(val name : String,
-                 val noteId : Int = 0) : Parcelable
+                 val noteId : Int = 0
+) : Parcelable
 
 sealed class Screen{
     object NotesListScreen : Screen()
-    class NoteScreen(val key : Int) : Screen()
+    class NoteScreen(val noteId : Int) : Screen()
 }
 @HiltViewModel
 class ScreenStackViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
@@ -30,7 +32,7 @@ class ScreenStackViewModel @Inject constructor(savedStateHandle: SavedStateHandl
                         list.add(ScreenInfo(name="NotesListScreen"))
                     }
                     is Screen.NoteScreen -> {
-                        list.add(ScreenInfo(name="NotesScreen", noteId = screen.key))
+                        list.add(ScreenInfo(name="NotesScreen", noteId = screen.noteId))
                     }
                 }
             }

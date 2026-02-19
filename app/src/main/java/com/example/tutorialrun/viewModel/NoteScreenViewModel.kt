@@ -1,5 +1,6 @@
 package com.example.tutorialrun.viewModel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,18 +17,29 @@ import javax.inject.Inject
 class NoteScreenViewModel @Inject constructor(
     @param:MockDao private val noteDao: NoteDao
 ) : ViewModel() {
-
+    var id : Int = 0
     var title by mutableStateOf("")
     var content by mutableStateOf("")
-
-    fun saveNote() {
+    fun getNote(noteId : Int){
+        if (noteId==0) return
         viewModelScope.launch {
-            val newNote = Note(
-                title = title,
-                content = content,
-                pinned = false
-            )
-            noteDao.insertNote(newNote)
+            val note = noteDao.getNoteById(noteId)
+            if (note!=null){
+                id=note.id
+                title = note.title
+                content = note.content
+            }
         }
+    }
+    fun saveNote(){
+        if (title.length==0) return
+        viewModelScope.launch {
+            noteDao.upsertNote(Note(id,title,content))
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("TRACKER","Testing on Clear")
     }
 }

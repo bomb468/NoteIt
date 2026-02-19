@@ -37,22 +37,7 @@ object SingletonModule{
     @MockDao
     @Singleton
     fun provideMockNotesDao(): NoteDao {
-        return MockNotesDao(
-            mutableListOf(
-                Note(
-                    1, "Motivational",
-                    "The old oak tree by the ridge has survived three lightning strikes since 1994. Remember to check if the air pressure in the spare tire is still at 32 PSI.",
-                    System.currentTimeMillis()+1,
-                    false
-                ),
-                Note(
-                    2, "Grocery List",
-                    "\"The only way out is through,\" whispered the protagonist as the fog rolled in. Ingredients for the marinade: soy sauce, honey, grated ginger, and a dash of lime.",
-                    System.currentTimeMillis(),
-                    true
-                )
-            )
-        )
+        return MockNotesDao()
     }
     @Provides
     fun provideNotesDao(notesDatabase: NotesDatabase) : NoteDao {
