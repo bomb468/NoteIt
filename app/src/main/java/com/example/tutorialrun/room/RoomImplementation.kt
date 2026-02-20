@@ -1,9 +1,7 @@
 package com.example.tutorialrun.room
 
-import android.os.Parcelable
 import androidx.room.Dao
 import androidx.room.Database
-import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -12,10 +10,8 @@ import androidx.room.Query
 import androidx.room.RoomDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import kotlinx.parcelize.Parcelize
 import kotlin.collections.plus
 
 @Entity
@@ -37,8 +33,8 @@ interface NoteDao{
     suspend fun getNoteById(id : Int) : Note?
     @Insert(onConflict=OnConflictStrategy.REPLACE)
     suspend fun upsertNote(note : Note)
-    @Query("DELETE FROM Note WHERE id = :id")
-    suspend fun deleteNodeById(id : Int)
+    @Query("DELETE FROM Note WHERE id IN (:ids)")
+    suspend fun deleteNotesById(ids: List<Int>)
 }
 
 class MockNotesDao(
@@ -85,16 +81,20 @@ class MockNotesDao(
     }
 
     override suspend fun upsertNote(note: Note) {
-        if (note.id==0) {
-            _notes.value += note.copy(id = _notes.value.size + 1)
-            return
+        _notes.update { currentList ->
+            if (note.id == 0) {
+                val newId = (currentList.maxOfOrNull { it.id } ?: 0) + 1
+                currentList + note.copy(id = newId)
+            } else {
+                currentList.map { if (it.id == note.id) note else it }
+            }
         }
-        _notes.value = _notes.value.map { if (it.id == note.id) note else it }
     }
 
-    override suspend fun deleteNodeById(id : Int) {
+    override suspend fun deleteNotesById(ids : List<Int>) {
         _notes.update { currentList ->
-            currentList.filterNot { it.id == id }
+            currentList.filter { !ids.contains(it.id)
+            }
         }
     }
 }

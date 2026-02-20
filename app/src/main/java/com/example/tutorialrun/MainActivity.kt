@@ -11,7 +11,13 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.example.tutorialrun.ui.theme.TutorialRunTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Scaffold
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
@@ -46,7 +52,10 @@ fun MainNavigation() {
         hiltViewModel<ScreenStackViewModel>(
             viewModelStoreOwner = LocalViewModelStoreOwner.current as ViewModelStoreOwner
         )
-    Box(modifier = Modifier.fillMaxSize().systemBarsPadding()){
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .windowInsetsPadding(WindowInsets.safeDrawing)
+    ){
         NavDisplay(
             entryDecorators = listOf(
                 // Add the default decorators for managing scenes and saving state

@@ -1,6 +1,7 @@
 package com.example.tutorialrun.screen
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,17 +16,22 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -54,15 +60,59 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tutorialrun.room.Note
 import com.example.tutorialrun.viewModel.NoteListViewModel
 
 @Composable
 fun NoteListScreen(noteListViewModel: NoteListViewModel = hiltViewModel(),
                    onClickOpenEditNote : (Int)->Unit) {
-
+    val context = LocalContext.current
     Column(modifier= Modifier.fillMaxSize()) {
+        if (noteListViewModel.showAlertDialogBox){
+            AlertDialog(
+                onDismissRequest = {
+                    noteListViewModel.toggleAlertBox()
+                },
+                title = { Text(text = "Confirm Action") },
+                text = {
+                    val scrollState = rememberScrollState()
+                    Text("Are you sure you want to delete all the notes titled,${noteListViewModel.stringOfNoteTitlesToBeDeleted}?",
+                        modifier = Modifier.verticalScroll(scrollState))
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        noteListViewModel.toggleAlertBox()
+                        noteListViewModel.runDeleteNodeQuery(context)
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = Color.Black
+                        ),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                        modifier = Modifier.widthIn(min = 75.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        border = BorderStroke(2.dp,Color.Black)
+                    ) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = { noteListViewModel.toggleAlertBox() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = Color.Black
+                        ),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                        modifier = Modifier.widthIn(min = 75.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        border = BorderStroke(2.dp,Color.Black)
+                    )   {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
         NoteListScreenTopBar(noteListViewModel.selectMode) { noteListViewModel.toggleSelectMode() }
         SearchBarForNotes(
             noteListViewModel.searchText,
@@ -89,7 +139,9 @@ fun NoteListScreen(noteListViewModel: NoteListViewModel = hiltViewModel(),
         NoteListScreenBottomBar(onClickOpenEditNote,
             noteListViewModel.allNotesSize,
             noteListViewModel.selectMode,
-            {noteListViewModel.runDeleteNodeQuery()})
+        ) {
+            noteListViewModel.toggleAlertBox()
+        }
     }
 }
 
@@ -109,7 +161,7 @@ fun NoteItem(note: Note,
         .padding(start=20.dp,end=20.dp,top=20.dp,bottom=20.dp))
     {
         Row(verticalAlignment = Alignment.CenterVertically){
-            if (selectMode){
+            AnimatedVisibility(selectMode) {
                 RadioButton(
                     selected = isSelected,
                     onClick = null,
@@ -141,10 +193,10 @@ fun NoteItem(note: Note,
 }
 
 @Composable
-fun NoteListScreenBottomBar(onClickOpenEditNote: (Int) -> Unit, notesListSize : Int, selectMode: Boolean,runDeleteNodeQuery : ()->Unit) {
-    val localContext = LocalContext.current
+fun NoteListScreenBottomBar(onClickOpenEditNote: (Int) -> Unit, notesListSize : Int, selectMode: Boolean,toggleAlertBox : ()->Unit) {
+    val localContext = LocalContext.current.applicationContext
     Box(
-        modifier = Modifier.fillMaxWidth().height(75.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 75.dp).padding(vertical = 10.dp),
         contentAlignment = Alignment.Center
     ){
         Spacer(
@@ -157,7 +209,7 @@ fun NoteListScreenBottomBar(onClickOpenEditNote: (Int) -> Unit, notesListSize : 
         Button(
             onClick = {
                 if (selectMode){
-                    runDeleteNodeQuery()
+                    toggleAlertBox()
                 }else{
                     if (notesListSize==10){
                         Toast.makeText(localContext, "You have reached the maximum number of notes", Toast.LENGTH_SHORT).show()
@@ -253,18 +305,23 @@ fun SearchBarForNotes(searchQuery : String,
 
 @Composable
 fun NoteListScreenTopBar(selectMode: Boolean, toggleSelectMode: () -> Unit) {
-    Box(
+    Row(
         modifier = Modifier
-            .fillMaxWidth().padding(20.dp),
-        contentAlignment = Alignment.Center
+            .fillMaxWidth()
+            .padding(20.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            modifier = Modifier.align(Alignment.CenterStart) ,
+            modifier = Modifier.weight(1f),
             text = "Notes List Screen",
             style = MaterialTheme.typography.titleLarge,
             fontSize = 30.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
         )
+        Spacer(modifier = Modifier.width(10.dp))
         Button(
             onClick = { toggleSelectMode() },
             colors = ButtonDefaults.buttonColors(
@@ -272,7 +329,7 @@ fun NoteListScreenTopBar(selectMode: Boolean, toggleSelectMode: () -> Unit) {
                 contentColor = Color.Black
             ),
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-            modifier = Modifier.align(Alignment.CenterEnd).width(75.dp),
+            modifier = Modifier.widthIn(min = 75.dp),
             shape = RoundedCornerShape(10.dp),
             border = BorderStroke(2.dp,Color.Black)
         ) {
@@ -284,37 +341,42 @@ fun NoteListScreenTopBar(selectMode: Boolean, toggleSelectMode: () -> Unit) {
 @Preview
 @Composable
 private fun TestScreen(){
-    /*
-    NoteListScreen(notesListFlow = flow{
-        emit(listOf(
-            Note(
-                id = 1,
-                title = "Project Phoenix Ideas",
-                content = "Consider using a graph database for the social module. Also, need to verify if the API rate limits allow for 500 requests per minute. Meeting on Friday at 10 AM."
-            ),
-            Note(
-                id = 2,
-                title = "Travel Checklist",
-                content = "Pack the universal adapter and the noise-canceling headphones. Don't forget to download the offline maps for Kyoto. Check-in opens 24 hours before the flight."
-            ),
-            Note(
-                id = 3,
-                title = "Workout Routine",
-                content = "Monday: Upper Body (Focus on Pull-ups and Bench Press). Wednesday: Lower Body (Squats 3x10). Friday: Cardio and Core. Keep the rest intervals under 60 seconds."
-            ),
-            Note(
-                id = 4,
-                title = "Book Quotes",
-                content = "‘All we have to decide is what to do with the time that is given us.’ – Gandalf. Also, find that passage about the lighthouse in the second chapter."
-            )
-        )) }
-    ){}
-    NoteItem(
-        Note(
-            id = 4,
-            title = "Book Quotes",
-            content = "‘All we have to decide is what to do with the time that is given us.’ – Gandalf. Also, find that passage about the lighthouse in the second chapter."
-        ),
-        true,
-    ) { }*/
+    var showAlertDialogBox by mutableStateOf(false)
+    AlertDialog(
+        modifier = Modifier.border(2.dp,Color.Black,RoundedCornerShape(0.dp)),
+        onDismissRequest = {
+            showAlertDialogBox = false
+        },
+        title = { Text(text = "Confirm Action") },
+        text = { Text("This is the dialog content. You must interact with me!") },
+        confirmButton = {
+            Button(onClick = { showAlertDialogBox = false },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.Black
+                ),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                modifier = Modifier.widthIn(min = 75.dp),
+                shape = RoundedCornerShape(10.dp),
+                border = BorderStroke(2.dp,Color.Black)
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = { showAlertDialogBox = false },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.Black
+                ),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                modifier = Modifier.widthIn(min = 75.dp),
+                shape = RoundedCornerShape(10.dp),
+                border = BorderStroke(2.dp,Color.Black)
+            )   {
+                    Text("Cancel")
+                }
+        }
+    )
 }

@@ -1,12 +1,13 @@
 package com.example.tutorialrun.viewModel
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tutorialrun.hilt.MockDao
 import com.example.tutorialrun.room.Note
 import com.example.tutorialrun.room.NoteDao
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,7 @@ import javax.inject.Inject
 import kotlin.collections.set
 
 @HiltViewModel
-class NoteListViewModel @Inject constructor(@MockDao private val noteDao: NoteDao) : ViewModel() {
+class NoteListViewModel @Inject constructor(private val noteDao: NoteDao) : ViewModel() {
 
     private var allNotes: List<Note> = emptyList()
     val allNotesSize : Int
@@ -45,6 +46,40 @@ class NoteListViewModel @Inject constructor(@MockDao private val noteDao: NoteDa
 
 
     val selectedMap = mutableStateMapOf<Int, Boolean>()
+
+    var showAlertDialogBox by mutableStateOf(false)
+
+    var stringOfNoteTitlesToBeDeleted : String = ""
+    fun toggleAlertBox(){
+        if (!showAlertDialogBox) {
+            if (selectedMap.values.any { it }) {
+                setStringOfNoteTitlesToBeDeleted()
+                showAlertDialogBox = true
+            } else {
+                toggleSelectMode()
+            }
+        } else {
+            showAlertDialogBox = false
+        }
+    }
+    fun setStringOfNoteTitlesToBeDeleted(){
+        stringOfNoteTitlesToBeDeleted = ""
+
+        var count = 1
+        val selectedIds = selectedMap.filter { it.value }.keys
+        val totalCount = selectedIds.size
+
+        for (id in selectedIds) {
+            val note = allNotes.find { it.id == id }
+            note?.let {
+                stringOfNoteTitlesToBeDeleted += " ${it.title}"
+                if (count != totalCount) stringOfNoteTitlesToBeDeleted += ","
+                count++
+            }
+        }
+    }
+
+
     init {
         viewModelScope.launch {
             noteDao.getAllNotes().collect { notes ->
@@ -86,15 +121,17 @@ class NoteListViewModel @Inject constructor(@MockDao private val noteDao: NoteDa
         selectedMap[noteId] = !current
     }
 
-    fun runDeleteNodeQuery(){
+    fun runDeleteNodeQuery(context: Context){
         viewModelScope.launch {
-            val idsToDelete = selectedMap.filter { it.value }.keys.toList()
-            withContext(Dispatchers.IO) {
-                idsToDelete.forEach { id ->
-                    noteDao.deleteNodeById(id)
+            try{
+                val idsToDelete = selectedMap.filter { it.value }.keys.toList()
+                withContext(Dispatchers.IO) {
+                    noteDao.deleteNotesById(idsToDelete)
                 }
+                toggleSelectMode()
+            }catch (e : Exception){
+                Toast.makeText(context, "Error deleting notes, Please try again", Toast.LENGTH_SHORT).show()
             }
-            toggleSelectMode()
         }
     }
 }
