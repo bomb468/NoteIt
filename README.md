@@ -1,34 +1,34 @@
-**📝 NoteIt - Minimalist Notes App**
+# 📝 NoteIt - Minimalist Notes App
 
 A modern, lightweight Android notes application built to demonstrate the latest Jetpack Compose ecosystem, including the experimental Navigation 3 framework.
 
-**✨ Features**
+## ✨ Features
 
-• Full CRUD Support: Effortlessly create, view, and manage your notes.
+- Full CRUD Support: Effortlessly create, view, and manage your notes.
 
-• Advanced Search: Filter through your notes with optional Case-Sensitivity toggling.
+- Advanced Search: Filter through your notes with optional Case-Sensitivity toggling.
 
-• Bulk Selection Mode: Select multiple notes at once to delete them in a single batch.
+- Bulk Selection Mode: Select multiple notes at once to delete them in a single batch.
 
-• Note Limit: Intelligently restricted to 10 notes maximum (to keep things organized!).
+- Note Limit: Intelligently restricted to 10 notes maximum (to keep things organized!).
 
-• Local Persistence: Powered by Room Database for offline reliability.
+- Local Persistence: Powered by Room Database for offline reliability.
 
-**🛠 Tech Stack**
+## 🛠 Tech Stack
 
 This project explores a modern Android architecture:
 
-• Jetpack Compose: Declarative UI implementation.
+- Jetpack Compose: Declarative UI implementation.
 
-• Navigation 3 (androidx.navigation3): Implementing the latest approach to screen transitions and backstack management.
+- Navigation 3 (androidx.navigation3): Implementing the latest approach to screen transitions and backstack management.
 
-• Room Persistence Library: Local database management with Flow support for real-time UI updates.
+- Room Persistence Library: Local database management with Flow support for real-time UI updates.
 
-• Dagger-Hilt: Dependency injection for clean and testable code.
+- Dagger-Hilt: Dependency injection for clean and testable code.
 
-• State Management: Using ViewModel and mutableStateOf for a reactive and performant UI.
+- State Management: Using ViewModel and mutableStateOf for a reactive and performant UI.
 
-🚀 Key Learning Points
+## 🚀 Key Learning Points
 
 This project was built to master specific modern Android concepts:
 
@@ -38,7 +38,7 @@ This project was built to master specific modern Android concepts:
 
 3. Hilt Integration: Providing NoteDao and ViewModel dependencies in a clean, modular way.
 
-📸 Screenshots
+## 📸 Screenshots
 
 <img width="1920" height="1080" alt="Screenshot (29)" src="https://github.com/user-attachments/assets/09f79e06-161e-495f-9616-405981b30079" />
 <img width="1920" height="1080" alt="Screenshot (30)" src="https://github.com/user-attachments/assets/1054b04b-6110-491b-a925-e92fcb081184" />
@@ -46,13 +46,9 @@ This project was built to master specific modern Android concepts:
 <img width="1920" height="1080" alt="Screenshot (32)" src="https://github.com/user-attachments/assets/72f6f832-ada9-4a1b-8b02-e25ab03f1daa" />
 <img width="1920" height="1080" alt="Screenshot (33)" src="https://github.com/user-attachments/assets/d29f4efa-7a9a-464f-8356-9d921be6aea6" />
 
-🔧 Installation
+## 🔧 Installation
 
-1. Clone this repository:
-
-Shell Script
-
-git clone https://github.com/your-username/TutorialRun.git
+1. Clone this repository :- ` git clone https://github.com/your-username/TutorialRun.git `
 
 2. Open the project in Android Studio (Ladybug or later recommended).
 
