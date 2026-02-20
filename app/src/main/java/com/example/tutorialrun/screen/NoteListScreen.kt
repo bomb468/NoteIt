@@ -1,5 +1,6 @@
 package com.example.tutorialrun.screen
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
@@ -196,14 +197,14 @@ fun NoteItem(note: Note,
 fun NoteListScreenBottomBar(onClickOpenEditNote: (Int) -> Unit, notesListSize : Int, selectMode: Boolean,toggleAlertBox : ()->Unit) {
     val localContext = LocalContext.current.applicationContext
     Box(
-        modifier = Modifier.fillMaxWidth().heightIn(min = 75.dp).padding(vertical = 10.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 75.dp),
         contentAlignment = Alignment.Center
     ){
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
-                .background(Color.Black) // Match your screen background
+                .background(Color.Black)
                 .align(Alignment.TopCenter)
         )
         Button(
@@ -211,7 +212,7 @@ fun NoteListScreenBottomBar(onClickOpenEditNote: (Int) -> Unit, notesListSize : 
                 if (selectMode){
                     toggleAlertBox()
                 }else{
-                    if (notesListSize==10){
+                    if (notesListSize>=9){
                         Toast.makeText(localContext, "You have reached the maximum number of notes", Toast.LENGTH_SHORT).show()
                     }else{
                         onClickOpenEditNote(0)
@@ -341,6 +342,7 @@ fun NoteListScreenTopBar(selectMode: Boolean, toggleSelectMode: () -> Unit) {
 @Preview
 @Composable
 private fun TestScreen(){
+    /*
     var showAlertDialogBox by mutableStateOf(false)
     AlertDialog(
         modifier = Modifier.border(2.dp,Color.Black,RoundedCornerShape(0.dp)),
@@ -378,5 +380,5 @@ private fun TestScreen(){
                     Text("Cancel")
                 }
         }
-    )
+    )*/
 }
