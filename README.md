@@ -48,7 +48,7 @@ This project was built to master specific modern Android concepts:
 
 ## 🔧 Installation
 
-1. Clone this repository :- ` git clone https://github.com/your-username/TutorialRun.git `
+1. Clone this repository :- ` git clone https://github.com/bomb468/NoteIt.git `
 
 2. Open the project in Android Studio (Ladybug or later recommended).
 
